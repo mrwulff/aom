@@ -1,14 +1,11 @@
 import graphics
-from graphics5 import *
+from graphics import *
 import os
 import fnmatch
 from urllib import *
 import xlrd
-from xlrd import *
-import xlwt
 from string import *
 import exifread
-import ExifTags
 from string import  *
 from os import listdir
 import glob
@@ -16,17 +13,10 @@ from os.path import isfile, join
 from geopy.distance import great_circle
 from geopy.distance import vincenty
 from timeit import default_timer as timer
-from xlutils.copy import copy
-from msvcrt import getch
-#import Tkinter as tk
-from PIL import  Image as Image2
 aomw=1280
 aomh=720
 
-def get_gps(win,img,la,lo):
-    errortext=Text(Point(600,150), '')
-    lat=0,0,0/1
-    lon=0,0,0/1
+def get_gps(img,la,lo):
     #print img
     tags = exifread.process_file(open(img, 'rb'))                                              
 
@@ -37,12 +27,8 @@ def get_gps(win,img,la,lo):
     try:
         lon=geo['GPS GPSLongitude']
         lat= geo['GPS GPSLatitude']
-       #print lon,lat
     except:
-        #lon=0
-        #lat=0
-        #win.getMouse()
-        print 'omg'
+        print geo
     #print type(lon)
     
     #print lon
@@ -59,49 +45,12 @@ def get_gps(win,img,la,lo):
 
         distance= vincenty(imglocation,maplocation).miles
         #print distance,a
-
         if distance<closest:
             #print 'yes'
             number=a
             closest=distance
     #print closest,number
-    if closest>1:
-        print
-        img2=img.replace('pics/','')
-        errortext=Text(Point(400,350), img+' was '+str(closest)+' miles from nearest location')
-        errortext.draw(win)
-        
-        cwd = os.getcwd()
-        cwd2=cwd+'/'+img
-        print cwd2
-        #os.system(cwd2)
-        sett=Text(Point(400,375), 'Set Location Number')
-        
-
-        background = Rectangle(Point(300,360), Point(500,390))
-        background.setFill('Green')
-        background.draw(win)
-        sett.draw(win)
-
-        ent=Entry(Point(510,375),5)
-        ent.draw(win)
-
-        skip =  Rectangle(Point(300,395), Point(500,425))
-        skip.setFill('Gray')
-        skip.draw(win)
-
-        skipt=Text(Point(400,415), 'Skip')
-        skipt.draw(win)
-        
-        print img2
-        convert2gif(img2)
-        img3='temp/'+img2+'.gif'
-        
-        excel=Image(Point(1050,(aomh/2)-50), img3)
-        excel.draw(win)
-        win.getMouse()
-        errortext.undraw()
-    return closest,number,
+    return closest,number
         
         
 def conv(deg):
@@ -242,10 +191,10 @@ def findjpg(la,lo,add,win):
         fou="Found"+str(len(a))+'pics'
         #print fou
         #print cc,len(a)
-        #try:
-        if 1==1:
+        try:
+        #if 1==1:
             #end = timer()
-            distance,mapn=get_gps(win,a[b],la,lo)
+            distance,mapn=get_gps(a[b],la,lo)
            
             
             #start = timer()
@@ -304,8 +253,8 @@ def findjpg(la,lo,add,win):
                 
             
             
-        #except:
-        #    print a[b],'NO DATA'
+        except:
+            print a[b],'NO DATA'
            # aomlogot2=Text(Point(600,80), "Found"+len[a]+'pics')
            # aomlogot2.draw(win)
 
@@ -327,9 +276,8 @@ def findjpg(la,lo,add,win):
         dd=dd.replace('/pics','')
         #dd='sorted/'+dd
         #print dd
-        ####DEBUG#####
-        #os.rename(a[b],dd)
-    return 0
+        os.rename(a[b],dd)
+        return 0
         
         
 
@@ -382,7 +330,6 @@ def getcord(test,mnv):
             
         
 def openexcel(win,filex):
-    init2(win,0,1,0,0)
     aomlogot2=Text(Point(600,80+(25*int(1))), '')
     aomlogot2.draw(win)
 
@@ -406,42 +353,25 @@ def openexcel(win,filex):
         #print
         for cx in range(sh.ncols):
             
-            idd= sh.cell_value(rx,cx)
-            #idd= str(cx)+'='+sh.cell_value(rx,cx)
+            idd= str(cx)+'='+sh.cell_value(rx,cx)
             excellist.append(idd)
-            if cx%2==1:
-                background = Rectangle(Point(200,67+(25*int(cx))), Point(aomw-200,93+(25*int(cx))))
-                background.setFill(color_rgb(250,230,230))
-                background.draw(win)
-                
             aomlogot = Text(Point(aomw/3,80+(25*int(cx))), idd)
             aomlogot.draw(win)
         flag=0
         for ly in range(len(listy)):
             
             idd= listy[ly]
-            try:
-                aomlogot.undraw()
-            except:
-                'not'
-            #aomlogot = Text(Point(aomw/3+200,80+(25*int(ly))), "Pick: "+idd)
-            aomlogot = Text(Point(aomw/3+200,50), "Pick:\n "+idd)
-            aomlogot.setStyle('bold')
-
+            aomlogot = Text(Point(aomw/3+200,80+(25*int(ly))), "Pick: "+idd)
             aomlogot.draw(win)
 
-            #z=getKey(win)
-            
+
             z=win.getMouse()
             x=z.getX()
             y=z.getY()
             print x,y
-            #print ord(z)
-            #z=win.getMouse()
-            #found=int(z)
             
             #aomlogot2.undraw()
-            found= int((y-75)/25)
+            found= ((y-75)/25)
             #print [found]
 
             aomlogot2 = Text(Point(aomw/3+400,80+(25*int(ly))), "Picked: "+excellist[found])
@@ -532,7 +462,7 @@ def openexcel(win,filex):
         aomlogot3.undraw()
         
             
-    init2(win,0,0,1,0)
+    init2(win)
             
 def findexcel(win):
     excel=Image(Point(50,70), 'ui/excel.gif')
@@ -555,14 +485,6 @@ def findexcel(win):
     for a in range(13):
         try:
             temp= listx[a]
-            if a%2==0:
-
-                background = Rectangle(Point(0,70+(25*int(a))), Point(aomw,95+(25*int(a))))
-                background.setFill(color_rgb(250,230,230))
-                background.draw(opener)
-
-            
-            
             aomlogot = Text(Point(aomw/2,80+(25*int(a))), temp)
             aomlogot.draw(opener)
         except:
@@ -582,16 +504,11 @@ def findexcel(win):
                 return listx[found]
             except:
                 ''
-        found= int(((y-80)/25))
+        found= ((y-80)/25)
         aomlogot = Text(Point(aomw/2,500), '...')
-        background = Rectangle(Point(50,400), Point(aomw-50,550))
-        background.setFill(color_rgb(230,230,230))
+        background = Rectangle(Point(0,400), Point(aomw,550))
+        background.setFill('white')
         background.draw(opener)
-        listx[found]
-
-        aomlogot = Text(Point(aomw/2,450), 'Open')
-        aomlogot.draw(opener)
-        
         aomlogot = Text(Point(aomw/2,500), listx[found])
         aomlogot.draw(opener)
         #flag=1
@@ -612,10 +529,6 @@ def init():
 
     win = GraphWin("ui test", aomw, aomh)
     #win.setFill('white')
-    print 'poop'
-
-
-
 
     #ent5=Entry(Point(1100,50),70)
     #ent5.draw(win)
@@ -644,40 +557,13 @@ def credit(win):
     z=win.getMouse()
     win.close()
 
-def init2(win,ex,fi,gp,he):
+def init2(win):
     background = Rectangle(Point(0,aomh+2), Point(aomw+2,0))
     background.setFill('white')
     background.draw(win)
-    
+
     bottomimage=Image(Point(aomw/2,aomh-50), 'ui/bottom2.gif')
     bottomimage.draw(win)
-
-    if ex==1:
-        excel=Image(Point(50,70), 'ui/excel.gif')
-    else:
-        excel=Image(Point(50,70), 'ui/excel20.gif')
-    excel.draw(win)
-
-    
-    if fi==1:
-        filler=Image(Point(50,220), 'ui/filter.gif')
-    else:
-        filler=Image(Point(50,220), 'ui/filter20.gif')
-    filler.draw(win)
-
-    if gp==1:
-        
-        gps=Image(Point(50,370), 'ui/gps.gif')
-    else:
-        gps=Image(Point(50,370), 'ui/gps20.gif')
-    gps.draw(win)
-
-
-    if he==1:
-        hh=Image(Point(50,520), 'ui/helplogo.gif')
-    else:
-        hh=Image(Point(50,520), 'ui/helplogo20.gif')
-    hh.draw(win)
 
 
 
@@ -688,82 +574,18 @@ def init2(win,ex,fi,gp,he):
 
     return win
 
-def editexcel(win,filex,lo,la):
 
-
-    aomlogot2=Text(Point(600,80+(25*int(1))), '')
-    aomlogot2.draw(win)
-
-    aomlogot4=Text(Point(600,80+(25*int(1))), '')
-    aomlogot4.draw(win)
-
-    book = xlrd.open_workbook(filex)
-
-    sh = book.sheet_by_index(0)
-    #print sh.name, sh.nrows, sh.ncols
-    #print "Cell D30 is", sh.cell_value(rowx=29, colx=3)
-    flag=0
-    excellist=[]
-    goodlist=[]
-    #raw_input('...')
-    listy=['Map Number','Station Name','Address1','State','Zip']
-
-    print sh.ncols
-    #book = xlwt.Workbook(filex)
-    
-    file_path = filex+'.edit.xls'
-    rb = open_workbook(filex,formatting_info=True)
-    r_sheet = rb.sheet_by_index(0) # read only copy to introspect the file
-    wb = copy(rb) # a writable copy (I can't read values out of this, only write to it)
-    w_sheet = wb.get_sheet(0) # the sheet to write to within the writable copy
-    w_sheet.write(0, sh.ncols, 'longitude')
-    w_sheet.write(0, sh.ncols+1, 'latitude')
-    for bb in range(1,sh.nrows,1):
-        w_sheet.write(bb, sh.ncols, (lo[bb]))
-        w_sheet.write(bb, sh.ncols+1, (la[bb]))
-    
-        
-    #longitude and latitude
-    wb.save(file_path)
-
-    #workbook.save()
-    
-    #win.getmouse()
-
-def convert2gif(i):
-    
-
-    image = Image2.open(i)
-
-
-    #image=Image.open(os.path.join(path, fileName))
-    for orientation in ExifTags.TAGS.keys() : 
-        if ExifTags.TAGS[orientation]=='Orientation' : break 
-    exif=dict(image._getexif().items())
-
-    if   exif[orientation] == 3 : 
-        image=image.rotate(180, expand=True)
-    elif exif[orientation] == 6 : 
-        image=image.rotate(270, expand=True)
-    elif exif[orientation] == 8 : 
-        image=image.rotate(90, expand=True)
-    basewidth = aomw/3
-    basewidth=int(basewidth)
-    
-    wpercent = (basewidth/float(image.size[0]))
-    hsize = int((float(image.size[1])*float(wpercent)))
-        
-
-
-
-    
-    image = image.resize((basewidth,hsize), Image2.ANTIALIAS)
-    image.save('temp/'+i+'.gif','PPM')
 def main(win):
 
     aomlogot = Text(Point(40,125), "Load...")
     aomlogot.draw(win)
 
+    excel=Image(Point(50,70), 'ui/excel.gif')
+    excel.draw(win)
+
+
+    hh=Image(Point(aomw-50,70), 'ui/helplogo.gif')
+    hh.draw(win)
 
     go=1
     print 'ok'
@@ -782,29 +604,22 @@ def main(win):
             print filex
             aomlogot.undraw()
             aomlogot = Text(Point(40,125), "Loaded")
-            #editexcel(win,filex)
             openexcel(win,filex)
             la,lo,add=make_list()
-            editexcel(win,filex,la,lo)
             go=findjpg(la,lo,add,win)
         if x>1000 and x<1280 and y >35 and y<135:
             helps(win)
             
             
             
-    z=win.getMouse()       
-    #credit(win)
+            
+    credit(win)
 def start():
 
     win=init()
-    #size=100,100
-    #i= "c:/py/2016/aom/pics/IMG_3397.JPG"
-
-
-
-
-    init2(win,1,0,0,0)
+    init2(win)
     main(win)
+    
 
 
 
